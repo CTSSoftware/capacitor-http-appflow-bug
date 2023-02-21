@@ -32,8 +32,8 @@ export class HomePage implements OnDestroy, AfterViewInit {
   }
 
   async test(): Promise<any> {
-    const appId='40131b15';
-    const channel='Dev';
+    const appId='c836b4a7';
+    const channel='Buggy';
 
     if (Capacitor.isNativePlatform()) {
       // step 1 - configure
@@ -68,7 +68,6 @@ export class HomePage implements OnDestroy, AfterViewInit {
         console.log('########## Are there updates?', updateCheckResponse);
       } catch (err) { console.error(err); }
     } else {
-
       console.log('########## Cannot use cordova on web platform');
     }
   }
