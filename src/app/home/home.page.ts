@@ -9,7 +9,8 @@ import { Capacitor } from '@capacitor/core';
   styleUrls: ['home.page.scss'],
 })
 export class HomePage implements OnDestroy, AfterViewInit {
-  @ViewChild('myDiv') myDiv!: ElementRef;
+  @ViewChild('logDiv') logDiv!: ElementRef;
+  @ViewChild('errorDiv') errorDiv!: ElementRef;
   private isInitialized = false;
 
   constructor(
@@ -39,7 +40,6 @@ export class HomePage implements OnDestroy, AfterViewInit {
       // step 1 - configure
       try {
         console.log(`########## Configuring ${appId} on channel ${channel}`);
-        debugger;
         await this.deploy.configure({
           appId: appId,
           channel: channel
@@ -51,22 +51,15 @@ export class HomePage implements OnDestroy, AfterViewInit {
       try {
         console.log('########## Fetching Configuration from server');
         const config = await this.deploy.getConfiguration();
-        console.log('########## Configuration Fetched', config);
+        console.log('########## Configuration Fetched...', config);
       } catch (err) { console.error(err); }
 
-      // step 3 - fetch configuration to verify
-      try {
-        console.log('########## Getting all available versions from the server');
-        const versions = await this.deploy.getAvailableVersions();
-        console.log('########## Available Versions Fetched', versions);
-      } catch (err) { console.error(err); }
-
-      // step 4 - fetch configuration to verify
+      // step 4 - fetch configuration to verify (THIS IS WHERE THE ERROR IS)
       try {
         console.log('########## Checking for updates');
         const updateCheckResponse = await this.deploy.checkForUpdate();
         console.log('########## Are there updates?', updateCheckResponse);
-      } catch (err) { console.error(err); }
+      } catch (err) { console.error('ERROR RUNNING CHECK RESPONSE', err); }
     } else {
       console.log('########## Cannot use cordova on web platform');
     }
@@ -75,9 +68,17 @@ export class HomePage implements OnDestroy, AfterViewInit {
   private logHandler(logLevel: LogLevel, data: any[]) {
     this.zone.runGuarded(() => {
       try {
-        if (data && data.length > 0 && this.myDiv) {
-          const div = (this.myDiv.nativeElement as HTMLDivElement);
-          div.innerText += data[0].toString() + '\n';
+        if (data && data.length > 0 && this.errorDiv && this.logDiv) {
+          const div = ((logLevel !== LogLevel.Fatal ? this.logDiv : this.errorDiv).nativeElement as HTMLDivElement);
+          data.forEach(item => {
+            try {
+              let itemStr = typeof(item) === 'string' ? item : JSON.stringify(item, null, 2);
+              if (itemStr === '{}') {
+                itemStr = item.toString();
+              }
+              div.innerText += itemStr.toString() + `\n`;
+            } catch (err) {}
+          });
           div.scrollTo({behavior: 'smooth', top: div.clientHeight+20})
         }
       } catch (err) {}

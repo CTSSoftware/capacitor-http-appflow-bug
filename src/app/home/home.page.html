@@ -14,12 +14,10 @@
   </ion-header>
 
   <div id="container">
-    <input type="button" (click)="test()" value="CLICK ME"/>
-    <strong>Ready to create an app?</strong>
-    <p>Start with Ionic <a target="_blank" rel="noopener noreferrer" href="https://ionicframework.com/docs/components">UI Components</a></p>
 
-    <div #myDiv class="code-div">
+    <div #logDiv class="code-div"></div>
+    <input type="button" (click)="test()" value="RUN THE TEST"/>
 
-    </div>
+    <div #errorDiv class="error-div"></div>
   </div>
 </ion-content>

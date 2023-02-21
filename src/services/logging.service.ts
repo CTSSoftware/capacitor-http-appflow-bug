@@ -40,11 +40,11 @@ export class LoggingService {
         this.backupConsole.error = console.error;
         this.backupConsole.error = console.trace; // tslint:disable-line:no-console
         this.backupConsole.error = console.info; // tslint:disable-line:no-console
-        console.log = ((data) => this._log(data));
-        console.warn = ((data) => this._warn(data));
-        console.error = ((data) => this._error(data));
-        console.trace = ((data) => this._trace(data)); // tslint:disable-line:no-console
-        console.info = ((data) => this._info(data)); // tslint:disable-line:no-console
+        console.log = ((...data: any[]) => this._log(...data));
+        console.warn = ((...data: any[]) => this._warn(...data));
+        console.error = ((...data: any[]) => this._error(...data));
+        console.trace = ((...data: any[]) => this._trace(...data)); // tslint:disable-line:no-console
+        console.info = ((...data: any[]) => this._info(...data)); // tslint:disable-line:no-console
       }/* else {
         console.log = this.backupConsole.log;
         console.warn = this.backupConsole.warn;
@@ -57,15 +57,18 @@ export class LoggingService {
     } catch (err) {}
   }
 
-  private handleLog(logLevel: LogLevel, data: any[]) {
+  private handleLog(logLevel: LogLevel, data: any) {
     this.init();
-    const args = (data || []).slice(0);
-      if (!!this._handler) {
-        try {
-          this._handler(logLevel, args);
-        } catch (err)  {}
-      }
-      this.logToConsoleInternal(logLevel, args);
+    let args: any[] = [];
+    if (Array.isArray(data)) args.push.apply(args, data);
+    else if (data) args.push(data);
+
+    if (!!this._handler) {
+      try {
+        this._handler(logLevel, args);
+      } catch (err)  {}
+    }
+    this.logToConsoleInternal(logLevel, args);
   }
 
   private logToConsoleInternal(logLevel: LogLevel, args: any[]) {
@@ -90,24 +93,24 @@ export class LoggingService {
       }
   }
 
-  log(message: any, ...data: any[]) {
-    this.handleLog(LogLevel.Verbose, [message, ...data]);
+  log(...data: any[]) {
+    this.handleLog(LogLevel.Verbose, data);
   }
 
-  logInformation(message: string, ...data: any[]) {
-      this.handleLog(LogLevel.Information, [message, ...data]);
+  logInformation(...data: any[]) {
+      this.handleLog(LogLevel.Information, data);
   }
 
-  logTrace(message: string, ...data: any[]) {
-      this.handleLog(LogLevel.Debug, [message, ...data]);
+  logTrace(...data: any[]) {
+      this.handleLog(LogLevel.Debug, data);
   }
 
-  logWarning(message: string, ...data: any[]) {
-      this.handleLog(LogLevel.Warning, [message, ...data]);
+  logWarning(...data: any[]) {
+      this.handleLog(LogLevel.Warning, data);
   }
 
-  logFatal(message: string, ...data: any[]) {
-      this.handleLog(LogLevel.Fatal, [message, ...data]);
+  logFatal(...data: any[]) {
+      this.handleLog(LogLevel.Fatal, data);
   }
 
   _log(...data: any[]) {
