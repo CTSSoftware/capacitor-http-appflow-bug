@@ -1,0 +1,7 @@
+{
+  "name": "capacitor-http-appflow-bug",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular"
+}
